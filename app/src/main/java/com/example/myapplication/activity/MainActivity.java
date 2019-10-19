@@ -16,16 +16,17 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.start)
     Button start;
 
-    View.OnClickListener onClickListener =new View.OnClickListener() {
+    View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
+            switch (v.getId()) {
                 case R.id.start:
-                    Intent intent=new Intent(MainActivity.this,MeasureTreeHeightActivity.class);
+                    Intent intent = new Intent(MainActivity.this, MeasureTreeHeightActivity.class);
                     startActivity(intent);
             }
         }
     };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
