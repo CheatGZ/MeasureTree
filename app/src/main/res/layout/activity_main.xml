@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center_horizontal"
+    android:gravity="center"
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
@@ -12,14 +12,24 @@
         android:id="@+id/start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Start"
+        android:text="测量树高"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/measure_data"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="第一步：输入标尺的高度(即手机摄像头距离地面高度，默认1.5m)，\n\n
+        估算方法：将手机与眼睛齐平，标尺高度=身高-0.2m\n\n
+第二步：将手机向下倾斜，使手机屏幕中间的红色准星对准树根，点击“树根”按钮\n\n
+
+第三步：将手机向上倾斜，使手机屏幕中间的红色准星对准树顶，点击“树顶”按钮\n\n
+
+第四步：点击“确认”按钮，得到树高
+"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"/>
+
 </LinearLayout>

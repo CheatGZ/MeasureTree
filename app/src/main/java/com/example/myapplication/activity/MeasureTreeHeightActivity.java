@@ -25,9 +25,11 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.Surface;
-import android.view.SurfaceHolder;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Button;
@@ -36,8 +38,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.myapplication.R;
+import com.example.myapplication.adapter.MeasureDataAdapter;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -58,6 +64,8 @@ public class MeasureTreeHeightActivity extends AppCompatActivity implements View
     TextureView textureView;
     @BindView(R.id.tree_height)
     Button treeHeight;
+    @BindView(R.id.measure_data)
+    RecyclerView measureData;
     //陀螺仪传感器
     private SensorManager sensorManager = null;
     private Sensor magneticSensor = null;//地磁传感器
@@ -81,6 +89,9 @@ public class MeasureTreeHeightActivity extends AppCompatActivity implements View
     double azimuth;
     double pitch;
     double roll;
+
+    private List<String> dataList = new ArrayList<>();//测量数据
+    private MeasureDataAdapter adapter;
 
     private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
         @RequiresApi(api = Build.VERSION_CODES.P)
@@ -119,6 +130,11 @@ public class MeasureTreeHeightActivity extends AppCompatActivity implements View
 
         @Override
         public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+            // 释放Camera资源
+            if (null != mCameraDevice) {
+                mCameraDevice.close();
+                MeasureTreeHeightActivity.this.mCameraDevice = null;
+            }
             return false;
         }
 
@@ -147,6 +163,11 @@ public class MeasureTreeHeightActivity extends AppCompatActivity implements View
         treeBottom.setOnClickListener(this);
         treeTop.setOnClickListener(this);
         treeHeight.setOnClickListener(this);
+
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        measureData.setLayoutManager(linearLayoutManager);
+        adapter = new MeasureDataAdapter(dataList);
+        measureData.setAdapter(adapter);
     }
 
     private void initCamera2() {
@@ -230,23 +251,31 @@ public class MeasureTreeHeightActivity extends AppCompatActivity implements View
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override
     public void onClick(View v) {
+        DecimalFormat decimalFormat=new DecimalFormat("######0.00");
         switch (v.getId()) {
             case R.id.tree_bottom:
-                treeBottom.setText((90D + pitch) + "");
+                treeBottom.setText("俯角："+decimalFormat.format(90D + pitch));
                 angle1 = 90D + pitch;
                 break;
             case R.id.tree_top:
-                treeTop.setText((90D + pitch) + "");
+                treeTop.setText("仰角："+decimalFormat.format(90D + pitch) );
                 angle2 = 90D + pitch;
                 break;
             case R.id.tree_height:
                 if (rulerValue.getText().toString().length() > 0) {
                     ruler = Double.parseDouble(rulerValue.getText().toString());
-                    treeHeight.setText(calculateTHFlat(ruler, angle1, angle2) + "");
+                    treeHeight.setText("树高："+decimalFormat.format(calculateTHFlat(ruler, angle1, angle2))+" m");
                 } else {
-                    treeHeight.setText(calculateTHFlat(ruler, angle1, angle2) + "");
+                    treeHeight.setText("树高："+decimalFormat.format(calculateTHFlat(ruler, angle1, angle2))+" m");
                 }
+                dataList.add(decimalFormat.format(calculateTHFlat(ruler, angle1, angle2))+" m");
+                adapter.notifyDataSetChanged();
                 break;
             default:
                 break;
@@ -289,6 +318,7 @@ public class MeasureTreeHeightActivity extends AppCompatActivity implements View
         double roll = Math.toDegrees(values[2]);
 
         slantAngle.invalidate();
-        slantAngle.setText(pitch + "");
+        DecimalFormat decimalFormat = new DecimalFormat("######0.00");
+        slantAngle.setText("手机倾角："+decimalFormat.format(pitch));
     }
 }
